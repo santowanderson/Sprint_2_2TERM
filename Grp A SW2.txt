@@ -1,0 +1,150 @@
+enable
+configure terminal
+hostname SW2
+banner motd "                                                                                                            
+   SSSSSSSSSSSSSSS EEEEEEEEEEEEEEEEEEEEEENNNNNNNN        NNNNNNNN               AAA               IIIIIIIIII
+ SS:::::::::::::::SE::::::::::::::::::::EN:::::::N       N::::::N              A:::A              I::::::::I
+S:::::SSSSSS::::::SE::::::::::::::::::::EN::::::::N      N::::::N             A:::::A             I::::::::I
+S:::::S     SSSSSSSEE::::::EEEEEEEEE::::EN:::::::::N     N::::::N            A:::::::A            II::::::II
+S:::::S              E:::::E       EEEEEEN::::::::::N    N::::::N           A:::::::::A             I::::I  
+S:::::S              E:::::E             N:::::::::::N   N::::::N          A:::::A:::::A            I::::I  
+ S::::SSSS           E::::::EEEEEEEEEE   N:::::::N::::N  N::::::N         A:::::A A:::::A           I::::I  
+  SS::::::SSSSS      E:::::::::::::::E   N::::::N N::::N N::::::N        A:::::A   A:::::A          I::::I  
+    SSS::::::::SS    E:::::::::::::::E   N::::::N  N::::N:::::::N       A:::::A     A:::::A         I::::I  
+       SSSSSS::::S   E::::::EEEEEEEEEE   N::::::N   N:::::::::::N      A:::::AAAAAAAAA:::::A        I::::I  
+            S:::::S  E:::::E             N::::::N    N::::::::::N     A:::::::::::::::::::::A       I::::I  
+            S:::::S  E:::::E       EEEEEEN::::::N     N:::::::::N    A:::::AAAAAAAAAAAAA:::::A      I::::I  
+SSSSSSS     S:::::SEE::::::EEEEEEEE:::::EN::::::N      N::::::::N   A:::::A             A:::::A   II::::::II
+S::::::SSSSSS:::::SE::::::::::::::::::::EN::::::N       N:::::::N  A:::::A               A:::::A  I::::::::I
+S:::::::::::::::SS E::::::::::::::::::::EN::::::N        N::::::N A:::::A                 A:::::A I::::::::I
+ SSSSSSSSSSSSSSS   EEEEEEEEEEEEEEEEEEEEEENNNNNNNN         NNNNNNNAAAAAAA                   AAAAAAAIIIIIIIIII
+"
+ip ssh version 2
+enable secret cisco
+service password-encryption
+ip domain-name senai.local
+crypto key generate rsa general-key modulus 1024
+username cisco privilege 15 secret cisco
+no ip dhcp snooping
+no ip domain-lookup
+line console 0
+password cisco
+login local
+exit
+line vty 0 15
+transport input ssh
+login local
+exec-timeout 10
+exit
+vtp mode client
+vtp domain GRUPO-A
+vtp password GrupoA
+interface vlan 100 
+ip address 10.128.18.244 255.255.255.240
+exit
+interface range f0/13-16
+switchport mode trunk
+switchport trunk allowed vlan 5,6,7,8,9,10,99,100,900
+switchport trunk native vlan 900
+channel-group 1 mode auto
+cdp enable
+no shutdown
+exit
+interface range f0/1-2
+switchport mode access
+switchport access vlan 5
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+cdp enable
+no shutdown
+exit
+interface range f0/3-4
+switchport mode access
+switchport access vlan 6
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+cdp enable
+no shutdown
+exit
+interface range f0/5-6
+switchport mode access
+switchport access vlan 7
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+cdp enable
+no shutdown
+exit
+interface range f0/7-8
+switchport mode access
+switchport access vlan 8
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+cdp enable
+no shutdown
+exit
+interface range f0/9-10
+switchport mode access
+switchport access vlan 9
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+cdp enable
+no shutdown
+exit
+interface range f0/11-12
+switchport mode access
+switchport access vlan 10
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+cdp enable
+no shutdown
+exit
+interface range f0/17-24
+switchport mode access 
+switchport access vlan 99
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+no cdp enable
+shutdown
+exit
+interface range g0/1-2
+shutdown
+no cdp enable
+exit
+spanning-tree mode rapid-pvst 
+ip default-gateway 10.128.18.241
+do wr

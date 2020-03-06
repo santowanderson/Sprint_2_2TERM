@@ -1,0 +1,103 @@
+enable
+configure terminal
+hostname RT1
+banner motd "                                                                                                            
+   SSSSSSSSSSSSSSS EEEEEEEEEEEEEEEEEEEEEENNNNNNNN        NNNNNNNN               AAA               IIIIIIIIII
+ SS:::::::::::::::SE::::::::::::::::::::EN:::::::N       N::::::N              A:::A              I::::::::I
+S:::::SSSSSS::::::SE::::::::::::::::::::EN::::::::N      N::::::N             A:::::A             I::::::::I
+S:::::S     SSSSSSSEE::::::EEEEEEEEE::::EN:::::::::N     N::::::N            A:::::::A            II::::::II
+S:::::S              E:::::E       EEEEEEN::::::::::N    N::::::N           A:::::::::A             I::::I  
+S:::::S              E:::::E             N:::::::::::N   N::::::N          A:::::A:::::A            I::::I  
+ S::::SSSS           E::::::EEEEEEEEEE   N:::::::N::::N  N::::::N         A:::::A A:::::A           I::::I  
+  SS::::::SSSSS      E:::::::::::::::E   N::::::N N::::N N::::::N        A:::::A   A:::::A          I::::I  
+    SSS::::::::SS    E:::::::::::::::E   N::::::N  N::::N:::::::N       A:::::A     A:::::A         I::::I  
+       SSSSSS::::S   E::::::EEEEEEEEEE   N::::::N   N:::::::::::N      A:::::AAAAAAAAA:::::A        I::::I  
+            S:::::S  E:::::E             N::::::N    N::::::::::N     A:::::::::::::::::::::A       I::::I  
+            S:::::S  E:::::E       EEEEEEN::::::N     N:::::::::N    A:::::AAAAAAAAAAAAA:::::A      I::::I  
+SSSSSSS     S:::::SEE::::::EEEEEEEE:::::EN::::::N      N::::::::N   A:::::A             A:::::A   II::::::II
+S::::::SSSSSS:::::SE::::::::::::::::::::EN::::::N       N:::::::N  A:::::A               A:::::A  I::::::::I
+S:::::::::::::::SS E::::::::::::::::::::EN::::::N        N::::::N A:::::A                 A:::::A I::::::::I
+ SSSSSSSSSSSSSSS   EEEEEEEEEEEEEEEEEEEEEENNNNNNNN         NNNNNNNAAAAAAA                   AAAAAAAIIIIIIIIII
+"
+enable secret cisco
+service password-encryption
+ip domain-name senai.local
+crypto key generate rsa general-keys modulus 1024
+username cisco privilege 15 secret cisco
+login block-for 180 attempts 3 within 60
+no ip dhcp snooping
+no ip domain-lookup
+line console 0
+login local
+exit
+ip ssh version 2
+line vty 0 15
+transport input ssh
+exec-timeout 5
+login local
+exit
+interface range gigabitethernet 0/0-1
+cdp enable
+exit
+interface gigabitethernet 0/1
+no shutdown
+description saida p/sw1
+exit
+interface g0/2
+no shutdown
+exit
+interface g0/2.5
+encapsulation dot1q 5
+ip address 10.128.16.1 255.255.255.0
+description VLAN 5
+exit
+interface g0/2.6
+encapsulation dot1q 6
+ip address 10.128.14.1 255.255.255.0
+description VLAN 6
+exit
+interface g0/2.7
+encapsulation dot1q 7
+ip address 10.128.18.1 255.255.255.128
+description VLAN 7
+exit
+interface g0/2.8
+encapsulation dot1q 8
+ip address 10.128.18.129 255.255.255.192
+description VLAN 8
+exit
+interface g0/2.9
+encapsulation dot1q 9
+ip address 10.128.17.1 255.255.255.0
+description VLAN 9
+exit
+interface g0/2.10
+encapsulation dot1q 10
+ip address 10.128.0.1 255.255.252.0
+description VLAN 10
+exit
+interface g0/2.100
+encapsulation dot1 100
+ip address 10.128.18.241 255.255.255.240
+description VLAN DE GERENCIAMENTO
+exit
+interface gigabitethernet 0/0
+ip address 201.187.236.9 255.255.255.252
+no shutdown
+description saida P/RT2
+exit
+ip route 0.0.0.0 0.0.0.0 201.187.236.10
+router ospf 1
+passive-interface default 
+no passive-interface gigabitEthernet 0/0
+default-information originate
+network 201.187.236.8 0.0.0.3 area 0
+network 10.128.16.0 0.0.0.255 area 0
+network 10.128.14.0 0.0.0.255 area 0
+network 10.128.18.0 0.0.0.127 area 0
+network 10.128.18.128 0.0.0.63 area 0
+network 10.128.17.0 0.0.0.255 area 0
+network 10.128.0.0 0.0.3.255 area 0
+network 10.128.18.240 0.0.0.15 area 0
+exit
+do wr

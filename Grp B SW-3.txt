@@ -1,0 +1,105 @@
+enable
+configure terminal
+hostname SW3
+banner motd "
+  _____ ______ _   _          _____ 
+ / ____|  ____| \ | |   /\   |_   _|
+| (___ | |__  |  \| |  /  \    | |  
+ \___ \|  __| | . ` | / /\ \   | |  
+ ____) | |____| |\  |/ ____ \ _| |_ 
+|_____/|______|_| \_/_/    \_\_____|
+
+"
+enable secret cisco
+service password-encryption
+crypto key generate rsa general-keys modulus 1024
+username cisco privilege 15 secret cisco
+ip domain-name senai.local
+ip ssh version 2
+no cdp run
+spanning-tree mode rapid-pvst
+no ip dhcp snooping
+no ip domain-lookup
+ip default-gateway 10.128.18.242
+line console 0
+password cisco
+login local
+exit
+line vty 0 15
+password cisco
+login local
+transport input ssh
+transport output ssh
+exec-timeout 5
+exit
+vtp mode server
+vtp domain grupoB
+vtp password cisco
+vlan 11
+name VLAN-11
+vlan 12
+name VLAN-12
+vlan 13
+name VLAN-13
+vlan 14
+name VLAN-14
+vlan 15
+name VLAN-15
+vlan 16
+name VLAN-16
+vlan 99
+name vlan-99
+vlan 100
+name EQUIPAMENTOS
+vlan 900
+name NATIVA
+exit
+interface gigabitethernet 0/2
+description Saida P/ RT4
+switchport mode trunk
+switchport trunk native vlan 900
+switchport trunk allowed vlan 11,12,13,14,15,16,99,100,900
+cdp enable
+exit
+interface range fastethernet 0/13 -16
+description Saida p/ SW4
+switchport mode trunk
+switchport trunk allowed vlan 11,12,13,14,15,16,99,100,900
+switchport trunk native vlan 900
+channel-group 1 mode desirable
+cdp enable
+exit
+interface range fastethernet 0/1 -12
+description VLAN99
+switchport mode access
+switchport access vlan 99
+no cdp enable
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+shutdown
+exit
+interface range fastethernet 0/17 -24
+description VLAN99
+switchport mode access
+switchport access vlan 99
+no cdp enable
+no spanning-tree portfast disable
+no spanning-tree portfast bpdu-guard disable
+no spanning-tree portfast bpdu-filter disable
+switchport port-security
+switchport port-security maximum 1
+switchport port-security violation restrict
+switchport port-security mac-address stick
+shutdown
+exit
+interface vlan 100
+description Interface de Gerenciamento
+ip address 10.128.18.245 255.255.255.240
+no shutdown
+exit
+do wr

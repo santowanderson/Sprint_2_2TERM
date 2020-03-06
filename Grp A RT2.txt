@@ -1,0 +1,71 @@
+enable
+configure terminal
+hostname RT2
+banner motd "
+   SSSSSSSSSSSSSSS EEEEEEEEEEEEEEEEEEEEEENNNNNNNN        NNNNNNNN               AAA               IIIIIIIIII
+ SS:::::::::::::::SE::::::::::::::::::::EN:::::::N       N::::::N              A:::A              I::::::::I
+S:::::SSSSSS::::::SE::::::::::::::::::::EN::::::::N      N::::::N             A:::::A             I::::::::I
+S:::::S     SSSSSSSEE::::::EEEEEEEEE::::EN:::::::::N     N::::::N            A:::::::A            II::::::II
+S:::::S              E:::::E       EEEEEEN::::::::::N    N::::::N           A:::::::::A             I::::I  
+S:::::S              E:::::E             N:::::::::::N   N::::::N          A:::::A:::::A            I::::I  
+ S::::SSSS           E::::::EEEEEEEEEE   N:::::::N::::N  N::::::N         A:::::A A:::::A           I::::I  
+  SS::::::SSSSS      E:::::::::::::::E   N::::::N N::::N N::::::N        A:::::A   A:::::A          I::::I  
+    SSS::::::::SS    E:::::::::::::::E   N::::::N  N::::N:::::::N       A:::::A     A:::::A         I::::I  
+       SSSSSS::::S   E::::::EEEEEEEEEE   N::::::N   N:::::::::::N      A:::::AAAAAAAAA:::::A        I::::I  
+            S:::::S  E:::::E             N::::::N    N::::::::::N     A:::::::::::::::::::::A       I::::I  
+            S:::::S  E:::::E       EEEEEEN::::::N     N:::::::::N    A:::::AAAAAAAAAAAAA:::::A      I::::I  
+SSSSSSS     S:::::SEE::::::EEEEEEEE:::::EN::::::N      N::::::::N   A:::::A             A:::::A   II::::::II
+S::::::SSSSSS:::::SE::::::::::::::::::::EN::::::N       N:::::::N  A:::::A               A:::::A  I::::::::I
+S:::::::::::::::SS E::::::::::::::::::::EN::::::N        N::::::N A:::::A                 A:::::A I::::::::I
+ SSSSSSSSSSSSSSS   EEEEEEEEEEEEEEEEEEEEEENNNNNNNN         NNNNNNNAAAAAAA                   AAAAAAAIIIIIIIIII
+
+"
+enable secret cisco
+service password-encryption
+ip domain-name senai.local
+crypto key generate rsa general-keys modulus 1024
+username cisco privilege 15 secret cisco
+login block-for 180 attempts 3 within 60
+no ip dhcp snooping
+no ip domain-lookup
+line console 0
+login local
+exit
+ip ssh version 2
+line vty 0 15
+transport input ssh
+exec-timeout 5
+login local
+exit
+ip route 0.0.0.0 0.0.0.0 201.187.236.9
+ip route 0.0.0.0 0.0.0.0 187.201.167.14
+interface g0/0
+ip address 201.187.236.10 255.255.255.252
+no shutdown
+description CONEXAO COM RT1
+exit
+interface g0/1
+ip address 187.201.167.13 255.255.255.252
+no shutdown
+description CONEXAO COM RT3
+exit
+interface range g0/0-1
+cdp enable
+exit
+interface g0/2
+no cdp enable
+exit
+router bgp 65000
+neighbor 187.201.167.14 remote-as 65001 
+network 201.187.236.8 mask 255.255.255.252
+network 187.201.167.12 mask 255.255.255.252
+exit
+router ospf 1
+network 201.187.236.8 0.0.0.3 area 0
+network 187.201.167.12 0.0.0.3 area 0
+default-information originate
+passive-interface default
+no passive-interface g0/0
+no passive-interface g0/1
+exit
+do wr

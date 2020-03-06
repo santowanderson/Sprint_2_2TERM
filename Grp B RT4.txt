@@ -1,0 +1,97 @@
+enable
+configure terminal
+hostname RT4
+banner motd "
+  _____ ______ _   _          _____ 
+ / ____|  ____| \ | |   /\   |_   _|
+| (___ | |__  |  \| |  /  \    | |  
+ \___ \|  __| | . ` | / /\ \   | |  
+ ____) | |____| |\  |/ ____ \ _| |_ 
+|_____/|______|_| \_/_/    \_\_____|
+                                    
+"
+enable secret cisco
+ip domain-name senai.local
+service password-encryption
+crypto key generate rsa general-keys modulus 1024
+username cisco privilege 15 secret cisco
+login block-for 180 attempts 3 within 60
+ip ssh version 2
+no cdp run
+no ip dhcp snooping
+no ip domain-lookup
+ip route 0.0.0.0 0.0.0.0 158.236.221.17
+line console 0
+password cisco
+login local
+exit
+line vty 0 15
+password cisco
+transport input ssh
+transport output ssh
+exec-timeout 5
+login local
+exit
+interface gigabitethernet 0/0
+ip address 158.236.221.18 255.255.255.252
+description RT4/RT3
+cdp enable
+no shutdown
+exit
+interface gigabitethernet 0/2
+no shutdown
+cdp enable
+description Saida P/ Sw3
+exit
+interface gigabitethernet 0/2.11
+encapsulation dot1q 11
+ip address 10.128.15.1 255.255.255.0
+description SUBINT VLAN 11
+exit
+interface gigabitethernet 0/2.12
+encapsulation dot1q 12
+ip address 10.128.18.225 255.255.255.240
+description SUBINT VLAN 12
+exit
+interface gigabitethernet 0/2.13
+encapsulation dot1q 13
+ip address 10.128.12.1 255.255.254.0
+description SUBINT VLAN 13
+exit
+interface gigabitethernet 0/2.14
+encapsulation dot1q 14
+ip address 10.128.18.193 255.255.255.224
+description SUBINT VLAN 14
+exit
+interface gigabitethernet 0/2.15
+encapsulation dot1q 15
+ip address 10.128.8.1 255.255.252.0
+description SUBINT VLAN 15
+exit
+interface gigabitethernet 0/2.16
+encapsulation dot1q 16
+ip address 10.128.4.1 255.255.252.0
+description SUBINT VLAN 16
+exit
+interface gigabitethernet 0/2.100
+encapsulation dot1q 100
+ip address 10.128.18.242 255.255.255.240
+description VLAN DE EQUIPAMENTOS
+exit
+router rip
+version 2
+default-information originate
+no auto-summary
+passive-interface default
+no passive-interface gigabitethernet 0/0
+no passive-interface gigabitethernet 0/2
+network 158.236.221.16
+network 10.128.15.0
+network 10.128.18.224
+network 10.128.12.0
+network 10.128.18.192
+network 10.128.8.0
+network 10.128.4.0
+network 10.128.18.240
+exit
+do wr

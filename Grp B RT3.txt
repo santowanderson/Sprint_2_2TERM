@@ -1,0 +1,59 @@
+enable
+configure terminal
+hostname RT3
+enable secret cisco
+service password-encryption
+ip domain-name senai.local
+banner motd "  
+  _____ ______ _   _          _____ 
+ / ____|  ____| \ | |   /\   |_   _|
+| (___ | |__  |  \| |  /  \    | |  
+ \___ \|  __| | . ` | / /\ \   | |  
+ ____) | |____| |\  |/ ____ \ _| |_ 
+|_____/|______|_| \_/_/    \_\_____|
+                                    
+"
+crypto key generate rsa general-keys modulus 1024
+username cisco privilege 15 secret cisco
+login block-for 180 attempts 3 within 60
+ip ssh version 2
+no cdp run
+no ip dhcp snooping
+no ip domain-lookup
+line console 0
+password cisco
+login local
+exit
+line vty 0 15
+transport input ssh
+transport output ssh
+exec-timeout 5
+login local
+exit
+int g0/1
+ip address 187.201.167.14 255.255.255.252
+description Interface_para_RT2
+no shutdown
+int g0/0
+ip address 158.236.221.17 255.255.255.252
+description Interface_para_RT4
+no shutdown
+exit
+ip route 0.0.0.0 0.0.0.0 187.201.167.13
+ip route 0.0.0.0 0.0.0.0 158.236.221.18
+router bgp 65001
+neighbor 187.201.167.13 remote-as 65000
+network 187.201.167.12 mask 255.255.255.252
+network 158.236.221.16 mask 255.255.255.252
+exit
+router rip
+version 2
+no auto-summary
+passive-interface default
+no passive-interface g0/0
+no passive-interface g0/1
+network 158.236.221.16
+network 187.201.167.12
+exit
+do wr
+
